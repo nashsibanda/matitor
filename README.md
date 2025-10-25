@@ -1,5 +1,4 @@
-Matitor
-=======
+# Matitor
 
 Matitor is a *Mat*roska Sub*tit*le Extrac*tor*.
 
@@ -13,12 +12,11 @@ effect, the script takes care of naming the generated `.srt` exactly as the
 `.mkv` it was extracted from and placing the subtitle file next to the video
 file.
 
-How
----
+## How
 
-```
-$ python extract_subtitles.py -h
-usage: extract_subtitles.py [-h] mkv_file
+```shell
+$ python matitor.py -h
+usage: matitor.py [-h] mkv_file
 
 Extract subtitles from a Matroska file.
 
@@ -30,10 +28,9 @@ optional arguments:
 $
 ```
 
-Example
--------
+## Example
 
-```
+```shell
 $ python extract_subtitles.py my_summer_holidays.mkv
 Track number 2: Language: eng
                 Name: Foreign Speaking Parts Only
