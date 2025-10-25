@@ -1,4 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.13"
+# dependencies = ["pymkv2>=2.1.2"]
+# ///
+
 """Extract subtitles from a Matroska file."""
 
 import argparse
@@ -6,8 +11,20 @@ from pathlib import Path
 
 from pymkv import MKVFile, MKVTrack
 
+from pymkv.TypeTrack import get_track_extension as pymkv_get_track_extension
 
 TrackId = int
+
+ADDITIONAL_EXTENSIONS = {
+    "SubStationAlpha": "ssa",
+}
+
+
+def get_track_extension(track: MKVTrack) -> str | None:
+    base_extension = pymkv_get_track_extension(track)
+    if base_extension is None and (codec_id := track.track_codec) is not None:
+        return ADDITIONAL_EXTENSIONS.get(codec_id, base_extension)
+    return base_extension
 
 
 class Extractor:
@@ -25,7 +42,7 @@ class Extractor:
         }
 
     def _get_track_info_string(self, track: MKVTrack) -> str:
-        return f"ID: {track.track_id} - Lang: {track.language} - Track Name: {track.track_name}"
+        return f"ID: {track.track_id} - Lang: {track.language} - Track Name: {track.track_name} - Codec: {track.track_codec}"
 
     def extract(self):
         selected_track = self._ask_for_choice()
@@ -54,6 +71,7 @@ class Extractor:
 
     def _extract_track(self, track: MKVTrack):
         subtitle_file_path = self.file_path.parent
+        track.extension = get_track_extension(track)
 
         track.extract(subtitle_file_path)
 
