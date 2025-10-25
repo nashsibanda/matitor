@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-
 """Extract subtitles from a Matroska file."""
 
 import argparse
