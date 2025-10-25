@@ -3,18 +3,33 @@ revision = 1
 requires-python = ">=3.13"
 
 [[package]]
+name = "bcp47"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/35/66/259eed040158b4e4df04fdf2c9f5f6387dfb155e7005d8522b588a700ea7/bcp47-0.1.0.tar.gz", hash = "sha256:37cc7a03fd696149ebfe7de785c5bad473f911eddac8415cf479584049cf03d5", size = 13665 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/63/5a/33251b8d10e7f9e13caacc307629595a0fe7cc516100d44ad8fc4ef98a5d/bcp47-0.1.0-py3-none-any.whl", hash = "sha256:a567b7fe881c900916a9db62ac8f792370c7ddf2664e601b74eeed35d8758aa5", size = 13016 },
+]
+
+[[package]]
+name = "bitmath"
+version = "1.3.3.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ec/ec/808245570e00df2e1fe8252903da309f18eb58768f44fecc0215dafbc386/bitmath-1.3.3.1.tar.gz", hash = "sha256:293325f01e65defe966853111df11d39215eb705a967cb115851da8c4cfa3eb8", size = 88519 }
+
+[[package]]
 name = "matitor"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "mypy" },
-    { name = "sh" },
+    { name = "pymkv2" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "mypy", specifier = ">=1.18.2" },
-    { name = "sh", specifier = "==1.11" },
+    { name = "pymkv2", specifier = ">=2.1.2" },
 ]
 
 [[package]]
@@ -62,10 +77,27 @@ wheels = [
 ]
 
 [[package]]
-name = "sh"
-version = "1.11"
+name = "pymkv2"
+version = "2.1.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/39/ca/1db6ebefdde0a7b5fb639ebc0527d8aab1cdc6119a8e4ac7c1c0cc222ec5/sh-1.11.tar.gz", hash = "sha256:590fb9b84abf8b1f560df92d73d87965f1e85c6b8330f8a5f6b336b36f0559a4", size = 36821 }
+dependencies = [
+    { name = "bcp47" },
+    { name = "bitmath" },
+    { name = "python-iso639" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/be/72/b869ee45c827ca232443d88a7ab8055ff56916c745a5211626c6d5387baa/pymkv2-2.1.2.tar.gz", hash = "sha256:e3c649b44eebc2929e5ee447f22f84fa0c87277dfccf296d59173b2c870f17cd", size = 29783 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/a9/4685276c7949849539ed2bc56fd089c3bc44e1e7bcbe09d03b75697d5c18/pymkv2-2.1.2-py3-none-any.whl", hash = "sha256:9bb5c118f1a238fcaf87a62d220fc5c97bfd8b8631fe034ffbd768d8285a7aa1", size = 26728 },
+]
+
+[[package]]
+name = "python-iso639"
+version = "2025.2.18"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/19/45aa1917c7b1f4eb71104795b9b0cbf97169b99ec46cd303445883536549/python_iso639-2025.2.18.tar.gz", hash = "sha256:34e31e8e76eb3fc839629e257b12bcfd957c6edcbd486bbf66ba5185d1f566e8", size = 173552 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/54/a3/3ceaf89a17a1e1d5e7bbdfe5514aa3055d91285b37a5c8fed662969e3d56/python_iso639-2025.2.18-py3-none-any.whl", hash = "sha256:b2d471c37483a26f19248458b20e7bd96492e15368b01053b540126bcc23152f", size = 167631 },
+]
 
 [[package]]
 name = "typing-extensions"
