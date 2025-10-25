@@ -4,4 +4,7 @@ version = "0.1.0"
 description = "Matroska Subtitle Extractor"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "mypy>=1.18.2",
+    "sh==1.11",
+]
