@@ -5,6 +5,11 @@ description = "Matroska Subtitle Extractor"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "mypy>=1.18.2",
     "pymkv2>=2.1.2",
+    "pysubs2>=1.8.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
 ]
