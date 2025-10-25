@@ -2,6 +2,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 
+from subs_merge.batch import batch_extract
 from subs_merge.full_process import run_full_process
 from subs_merge.merger import FILE_EXTENSIONS as SUBTITLE_FILE_EXTENSIONS, Merger
 from subs_merge.extractor import Extractor
@@ -50,6 +51,24 @@ def file_dialog(
     if not file_path:
         raise NoFileSelectedError(title)
     return file_path
+
+
+def directory_dialog(
+    root: tk.Tk,
+    title: str,
+    initialdir: Path | None = None,
+) -> str:
+    initialdir = initialdir or Path.home()
+    start = str(initialdir.absolute())
+
+    directory_path = filedialog.askdirectory(
+        parent=root,
+        title=title,
+        initialdir=start,
+    )
+    if not directory_path:
+        raise NoFileSelectedError(title)
+    return directory_path
 
 
 def run_merge_gui():
@@ -112,4 +131,15 @@ def run_full_process_gui():
     )
     print(f"Additional Subtitle File: {Path(additional_subtitle_file_path).name}")
     run_full_process(mkv_file_path, additional_subtitle_file_path)
+    root.destroy()
+
+
+def run_batch_process_gui():
+    root = create_root("Subtitle Batch Processor")
+    directory_path = directory_dialog(
+        root=root,
+        title="Select the directory to process",
+    )
+    print(f"Directory: {directory_path}")
+    batch_extract(Path(directory_path))
     root.destroy()
