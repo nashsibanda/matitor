@@ -3,12 +3,13 @@ from pathlib import Path
 
 from subs_merge.full_process import run_full_process
 from subs_merge.extractor import Extractor
+from subs_merge.merger import FILE_EXTENSIONS
 
 
 def _get_subtitle_files(directory_path: Path, file_stem: str) -> list[Path]:
     subtitle_files = []
-    for ext in ["srt", "ass", "ssa", "sub"]:
-        subtitle_files_for_ext = list(directory_path.glob(f"*.{ext}"))
+    for ext in FILE_EXTENSIONS:
+        subtitle_files_for_ext = list(directory_path.glob(f"*{ext}"))
         subtitle_files_for_stem = [
             file for file in subtitle_files_for_ext if file.stem.startswith(file_stem)
         ]
