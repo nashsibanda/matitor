@@ -5,105 +5,60 @@
 """Extract subtitles from a Matroska file."""
 
 import argparse
-from os import path
-import re
-import sys
+from pathlib import Path
 
-import sh  # type: ignore[import-untyped]
+from pymkv import MKVFile, MKVTrack
 
 
-SUBTITLE_EXTENSION = "srt"
+TrackId = int
 
 
-class Track(object):
-    def __init__(self, track_number, language, name):
-        self._track_number = track_number
-        self._language = language
-        self._name = name
+class Extractor:
+    mkv_file: MKVFile
+    file_path: Path
+    subtitle_tracks: dict[TrackId, MKVTrack]
 
-    @property
-    def number(self):
-        return self._track_number
+    def __init__(self, mkv_file_path: str):
+        self.file_path = Path(mkv_file_path)
+        self.mkv_file = MKVFile(mkv_file_path)
+        self.subtitle_tracks = {
+            track.track_id: track
+            for track in self.mkv_file.tracks
+            if track.track_type == "subtitles"
+        }
 
-    def __str__(self):
-        prefix = "Track number {}:".format(self._track_number)
+    def _get_track_info_string(self, track: MKVTrack) -> str:
+        return f"ID: {track.track_id} - Lang: {track.language} - Track Name: {track.track_name}"
 
-        result = "{} Language: {}\n".format(prefix, self._language)
-        if self._name:
-            result += "{} Name: {}".format(len(prefix) * " ", self._name)
+    def extract(self):
+        selected_track = self._ask_for_choice()
+        self._extract_track(selected_track)
 
-        return result
+    def _ask_for_choice(self):
+        for track in self.subtitle_tracks.values():
+            print(self._get_track_info_string(track))
 
-
-class Extractor(object):
-    def extract(self, mkv_file):
-        tracks = self._get_tracks(mkv_file)
-        selected_track = self._ask_for_choice(tracks)
-        self._extract_track(mkv_file, selected_track)
-
-    def _get_tracks(self, mkv_file):
-        info = sh.mkvinfo(mkv_file).stdout
-
-        try:
-            raw_tracks = self._parse_segment(info)
-        except AttributeError:
-            sys.exit("Failed to find tracks segment in {}: {}".format(mkv_file, info))
-
-        return self._parse_tracks(raw_tracks)
-
-    def _parse_segment(self, info):
-        segment = re.search(
-            "^\|\+ Segment tracks\n^(.*?)^\|\+ ", info, re.MULTILINE | re.DOTALL
-        ).group(1)
-
-        tracks = segment.split("| + A track\n")
-
-        return filter(None, tracks)
-
-    def _parse_tracks(self, tracks):
-        subtitle_tracks = []
-
-        for track in tracks:
-            if re.search("Track type: subtitles", track):
-                track_num = re.search(
-                    "Track number: \d+ \(track ID for mkvmerge & mkvextract: (\d+)\)\n",
-                    track,
-                ).group(1)
-
-                language = re.search("Language: (.+)", track).group(1)
-
-                name_field = re.search("Name: (.+)", track)
-                name = name_field.group(1) if name_field else ""
-
-                subtitle_tracks.append(Track(track_num, language, name))
-
-        return subtitle_tracks
-
-    def _ask_for_choice(self, subtitle_tracks):
-        for track in subtitle_tracks:
-            print(track)
-
-        selected_track = input("Please enter the number of the track to be extracted: ")
-
-        if selected_track in [track.number for track in subtitle_tracks]:
-            return selected_track
-        else:
-            sys.exit("{} is not a valid track number. Exiting.".format(selected_track))
-
-    def _extract_track(self, mkv_file, track_number):
-        subtitle_file = "{}.{}".format(path.splitext(mkv_file)[0], SUBTITLE_EXTENSION)
-
-        try:
-            for chunk in sh.mkvextract(
-                "tracks",
-                mkv_file,
-                "{}:{}".format(track_number, subtitle_file),
-                _iter=True,
-                _out_bufsize=64,
+        selected_track_id = None
+        while selected_track_id is None:
+            raw_selected_track = input(
+                "Please enter the ID of the track to be extracted: "
+            )
+            if (
+                raw_selected_track.isdigit()
+                and (selected_track := int(raw_selected_track)) in self.subtitle_tracks
             ):
-                sys.stdout.write(chunk)
-        except sh.ErrorReturnCode as error:
-            sys.exit("{} exited with code {}".format(error.full_cmd, error.exit_code))
+                selected_track_id = selected_track
+            else:
+                print("Please enter a valid track ID.")
+        print(
+            f"Selected track: {self._get_track_info_string(self.subtitle_tracks[selected_track_id])}"
+        )
+        return self.subtitle_tracks[selected_track_id]
+
+    def _extract_track(self, track: MKVTrack):
+        subtitle_file_path = self.file_path.parent
+
+        track.extract(subtitle_file_path)
 
 
 if __name__ == "__main__":
@@ -111,4 +66,4 @@ if __name__ == "__main__":
     parser.add_argument("mkv_file", help="the .mkv to extract an .srt from")
     args = parser.parse_args()
 
-    Extractor().extract(args.mkv_file)
+    Extractor(args.mkv_file).extract()
